@@ -34,8 +34,13 @@ func GetOtterStatus(w http.ResponseWriter, req *http.Request, _ httprouter.Param
 	w.Write(bytef("the otter is %s", stat))
 }
 
+func HealthCheck(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+	w.WriteHeader(http.StatusOK)
+}
+
 func main() {
 	r := httprouter.New()
+	r.GET("/", HealthCheck)
 	r.GET("/otter/status", GetOtterStatus)
 	log.Fatal(http.ListenAndServe(":8080", r))
 }
