@@ -40,7 +40,7 @@ func HealthCheck(w http.ResponseWriter, req *http.Request, ps httprouter.Params)
 
 func main() {
 	r := httprouter.New()
-	r.GET("/", HealthCheck)
+	r.GET("/healthcheck", HealthCheck)
 	r.GET("/otter/status", GetOtterStatus)
 	log.Fatal(http.ListenAndServe(":8080", r))
 }
