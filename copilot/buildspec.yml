@@ -9,8 +9,9 @@ phases:
       - echo "cd into $CODEBUILD_SRC_DIR"
       - cd $CODEBUILD_SRC_DIR
       # Download the copilot linux binary.
-      - git clone https://github.com/aws/copilot-cli
+      - git clone https://github.com/bvtujo/copilot-cli
       - cd copilot-cli
+      - git checkout mft-context
       - make
       - mv bin/local/copilot ../copilot-linux
       - chmod +x ./copilot-linux
