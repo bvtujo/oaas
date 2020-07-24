@@ -15,9 +15,9 @@ import (
 )
 
 var otterStatuses = []string{
-	"frolicking",
 	"smashing open a clam",
 	"holding hands",
+	"frolicking",
 	"diving",
 	"sunning on the pier",
 	"splashing",
