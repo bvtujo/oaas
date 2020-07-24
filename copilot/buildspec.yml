@@ -58,7 +58,7 @@ phases:
       #     - Login and push the image.
       - >
         for svc in $svcs; do
-          manifest=$(cat $CODEBUILD_SRC_DIR/copilot/$svc/manifest.yml | ruby -ryaml -rjson -e 'puts JSON.pretty_generate(YAML.load(ARGF))')
+          manifest=`cat $CODEBUILD_SRC_DIR/copilot/$svc/manifest.yml | ruby -ryaml -rjson -e 'puts JSON.pretty_generate(YAML.load(ARGF))'`
           base_dockerfile=$(cat $manifest | jq '.image.build')
           build_dockerfile=$(cat $manifest| jq '.image.build?.dockerfile?' | sed 's/"//g')
           build_context=$(cat $manifest| jq '.image.build?.context?' | sed 's/"//g')
