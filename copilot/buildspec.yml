@@ -11,7 +11,7 @@ phases:
       # Download the copilot linux binary.
       - git clone https://github.com/bvtujo/copilot-cli
       - cd copilot-cli
-      - git checkout --track mft-context && git pull
+      - git checkout --track origin/mft-context && git pull
       - make
       - mv bin/local/copilot ../copilot-linux
       - cd ..
