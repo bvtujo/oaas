@@ -9,7 +9,8 @@ type: Load Balanced Web Service
 
 image:
   # Path to your service's Dockerfile.
-  build: ./Dockerfile
+  build: 
+    dockerfile: ./Dockerfile
   # Port exposed through your container to route traffic to it.
   port: 8080
 
