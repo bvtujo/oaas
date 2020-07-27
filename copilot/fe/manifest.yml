@@ -11,6 +11,9 @@ image:
   # Path to your service's Dockerfile.
   build: 
     dockerfile: ./Dockerfile
+    args:
+      key1: value1
+      ENV_VAR: ENV_VAR_VALUE
   # Port exposed through your container to route traffic to it.
   port: 8080
 
