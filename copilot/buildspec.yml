@@ -78,6 +78,7 @@ phases:
               build_args="$build_args --build-arg $art"
             done
           fi
+          codebuild_breakpoint
           echo "docker build -t $svc:$tag $build_args -f $df_path $df_dir_path";
           docker build -t $svc:$tag $build_args -f $df_path $df_dir_path;
           image_id=$(docker images -q $svc:$tag);
