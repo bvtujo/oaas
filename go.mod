@@ -2,4 +2,7 @@ module github.com/bvtujo/oaas/v2
 
 go 1.13
 
-require github.com/julienschmidt/httprouter v1.3.0 // indirect
+require (
+	github.com/aws/aws-sdk-go v1.33.13
+	github.com/julienschmidt/httprouter v1.3.0
+)
