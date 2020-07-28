@@ -64,30 +64,25 @@ phases:
           build_dockerfile=$(echo $manifest| jq 'if .image.build?.dockerfile? then .image.build.dockerfile else "" end' | sed 's/"//g')
           build_context=$(echo $manifest| jq 'if .image.build?.context? then .image.build.context else "" end' | sed 's/"//g')
           dockerfile_args=$(echo $manifest | jq 'if .image.build?.args? then .image.build.args else "" end | to_entries?')
-          echo $base_dockerfile
-          echo $build_dockerfile
-          echo $build_context
-          echo $dockerfile_args
           df_rel_path=$base_dockerfile
           if [ -n "$build_dockerfile" ]; then 
-            echo "found dockerfile key"
             df_rel_path=$build_dockerfile
           fi
-          echo "relative dockerfile path: $df_rel_path"
+          echo "Relative Dockerfile path: $df_rel_path"
           df_path=$df_rel_path
           df_dir_path=$(dirname "$df_path")
           if [ -n "$build_context" ]; then
-            echo "found context key"
             df_dir_path=$build_context
           fi
-          echo "build context: $df_dir_path"
+          echo "Docker build context: $df_dir_path"
           build_args=
           if [ -n "$dockerfile_args" ]; then
             for art in $(echo $dockerfile_args | jq -r '.[] | "\(.key)=\(.value)"'); do 
               build_args="$build_args --build-arg $art"
             done
           fi
-          echo "docker build -t $svc:$tag $build_args -f $df_path $df_dir_path";
+          echo "Docker build args: $build_args"
+          echo "Running command: docker build -t $svc:$tag $build_args -f $df_path $df_dir_path";
           docker build -t $svc:$tag $build_args -f $df_path $df_dir_path;
           image_id=$(docker images -q $svc:$tag);
           for env in $envs; do
