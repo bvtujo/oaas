@@ -49,6 +49,7 @@ phases:
             jq --arg a "https://stackset-otter-infrastru-pipelinebuiltartifactbuc-c4l5u8ucz8mo.s3-us-east-2.amazonaws.com/manual/$timestamp/$svc.addons.stack.yml" '.Parameters.AddonsTemplateURL = $a' ./infrastructure/$svc-test.params.json > "$tmp" && mv "$tmp" ./infrastructure/$svc-test.params.json
           fi
         done;
+      - codebuild-breakpoint
       # Build images
       # - For each manifest file:
       #   - Read the path to the Dockerfile by translating the YAML file into JSON.
@@ -58,27 +59,34 @@ phases:
       #     - Login and push the image.
       - >
         for svc in $svcs; do
-          manifest="$(cat $CODEBUILD_SRC_DIR/copilot/$svc/manifest.yml | ruby -ryaml -rjson -e 'puts JSON.pretty_generate(YAML.load(ARGF))')"
+          manifest=$(cat $CODEBUILD_SRC_DIR/copilot/$svc/manifest.yml | ruby -ryaml -rjson -e 'puts JSON.pretty_generate(YAML.load(ARGF))')
           base_dockerfile=$(echo $manifest | jq '.image.build')
-          build_dockerfile=$(echo $manifest| jq '.image.build?.dockerfile?' | sed 's/"//g')
-          build_context=$(echo $manifest| jq '.image.build?.context?' | sed 's/"//g')
-          dockerfile_args=$(echo $manifest | jq '.image.build?.args? | to_entries?')
+          build_dockerfile=$(echo $manifest| jq 'if .image.build?.dockerfile? then .image.build.dockerfile else "" end' | sed 's/"//g')
+          build_context=$(echo $manifest| jq 'if .image.build?.context? then .image.build.context else "" end' | sed 's/"//g')
+          dockerfile_args=$(echo $manifest | jq 'if .image.build?.args? then .image.build.args else "" end | to_entries?')
+          echo $base_dockerfile
+          echo $build_dockerfile
+          echo $build_context
+          echo $dockerfile_args
           df_rel_path=$base_dockerfile
           if [ -n "$build_dockerfile" ]; then 
+            echo "found dockerfile key"
             df_rel_path=$build_dockerfile
           fi
+          echo "relative dockerfile path: $df_rel_path"
           df_path=$df_rel_path
           df_dir_path=$(dirname "$df_path")
           if [ -n "$build_context" ]; then
+            echo "found context key"
             df_dir_path=$build_context
           fi
+          echo "build context: $df_dir_path"
           build_args=
           if [ -n "$dockerfile_args" ]; then
             for art in $(echo $dockerfile_args | jq -r '.[] | "\(.key)=\(.value)"'); do 
               build_args="$build_args --build-arg $art"
             done
           fi
-          codebuild_breakpoint
           echo "docker build -t $svc:$tag $build_args -f $df_path $df_dir_path";
           docker build -t $svc:$tag $build_args -f $df_path $df_dir_path;
           image_id=$(docker images -q $svc:$tag);
