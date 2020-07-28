@@ -68,22 +68,23 @@ phases:
           if [ -n "$build_dockerfile" ]; then 
             df_rel_path=$build_dockerfile
           fi
-          echo "Relative Dockerfile path: $df_rel_path"
           df_path=$df_rel_path
           df_dir_path=$(dirname "$df_path")
           if [ -n "$build_context" ]; then
             df_dir_path=$build_context
           fi
-          echo "Docker build context: $df_dir_path"
           build_args=
           if [ -n "$dockerfile_args" ]; then
             for art in $(echo $dockerfile_args | jq -r '.[] | "\(.key)=\(.value)"'); do 
-              build_args="$build_args --build-arg $art"
+              build_args="$build_args --build-arg $art "
             done
           fi
+          echo "Service: $svc"
+          echo "Relative Dockerfile path: $df_rel_path"
+          echo "Docker build context: $df_dir_path"
           echo "Docker build args: $build_args"
-          echo "Running command: docker build -t $svc:$tag $build_args -f $df_path $df_dir_path";
-          docker build -t $svc:$tag $build_args -f $df_path $df_dir_path;
+          echo "Running command: docker build -t $svc:$tag $build_args-f $df_path $df_dir_path";
+          docker build -t $svc:$tag $build_args-f $df_path $df_dir_path;
           image_id=$(docker images -q $svc:$tag);
           for env in $envs; do
             repo=$(cat $CODEBUILD_SRC_DIR/infrastructure/$svc-$env.params.json | jq '.Parameters.ContainerImage' | sed 's/"//g');
